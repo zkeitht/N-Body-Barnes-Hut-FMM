@@ -1,0 +1,72 @@
+New particle
+COM contribution of particle 0 added to box 0.
+Particle 0 added to box 0.
+
+New particle
+COM contribution of particle 1 added to box 0.
+Particle 1 added to box 0.
+
+New particle
+COM contribution of particle 2 added to box 0.
+box 0 full, creating children.
+COM contribution of particle 0 added to box 4.
+Particle 0 added to box 4.
+COM contribution of particle 1 added to box 4.
+Particle 1 added to box 4.
+COM contribution of particle 2 added to box 2.
+Particle 2 added to box 2.
+
+New particle
+COM contribution of particle 3 added to box 0.
+box 0 full, children exist.
+COM contribution of particle 3 added to box 2.
+Particle 3 added to box 2.
+
+New particle
+COM contribution of particle 4 added to box 0.
+box 0 full, children exist.
+COM contribution of particle 4 added to box 1.
+Particle 4 added to box 1.
+
+New particle
+COM contribution of particle 5 added to box 0.
+box 0 full, children exist.
+COM contribution of particle 5 added to box 2.
+box 2 full, creating children.
+COM contribution of particle 2 added to box 5.
+Particle 2 added to box 5.
+COM contribution of particle 3 added to box 6.
+Particle 3 added to box 6.
+COM contribution of particle 5 added to box 6.
+Particle 5 added to box 6.
+
+New particle
+COM contribution of particle 6 added to box 0.
+box 0 full, children exist.
+COM contribution of particle 6 added to box 4.
+box 4 full, creating children.
+COM contribution of particle 0 added to box 10.
+Particle 0 added to box 10.
+COM contribution of particle 1 added to box 10.
+Particle 1 added to box 10.
+COM contribution of particle 6 added to box 12.
+Particle 6 added to box 12.
+
+New particle
+COM contribution of particle 7 added to box 0.
+box 0 full, children exist.
+COM contribution of particle 7 added to box 3.
+Particle 7 added to box 3.
+
+New particle
+COM contribution of particle 8 added to box 0.
+box 0 full, children exist.
+COM contribution of particle 8 added to box 1.
+Particle 8 added to box 1.
+
+New particle
+COM contribution of particle 9 added to box 0.
+box 0 full, children exist.
+COM contribution of particle 9 added to box 3.
+Particle 9 added to box 3.
+
