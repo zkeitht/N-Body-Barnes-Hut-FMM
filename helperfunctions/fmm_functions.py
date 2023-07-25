@@ -1,7 +1,8 @@
 # FMM (helper) functions
 import numpy as np
 
-from classes import BoxComplex
+# from classes import BoxComplex # use this when running the notebook
+from ..classes import BoxComplex # use this when running modules from the "simulation" package
 
 def four_fractal(lvl):
     """Returns array of integer in a specific format to help in the indexing of FMM boxes.

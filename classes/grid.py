@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 # the GridComplex class inherits the Grid class
 # the Particle class inherits the Point class
 from .box import Box
-# from .point import Point, Particle
-# from .point import Particle
-
 
 class Grid():
     """Creates grid that acts as a "container" of the particles and a platform to 

@@ -72,8 +72,8 @@ def fmm_calc_phi(tree, idx_helpers, lvls, p):
         (neighbouring boxes + leaf child box sources -> leaf child box targets)
     """
     print()
-    print('start of fmm calc')
-    very_start = time.time()
+    print('start of fmm calc...')
+    fmm_start = time.time()
 
     keys = ['S2M', 'M2M', 'M2L', 'L2L', 'L2P', 'P2P']
     times = {key:[] for key in keys}
@@ -84,7 +84,7 @@ def fmm_calc_phi(tree, idx_helpers, lvls, p):
     toc = time.perf_counter()
     times[keys[0]].append(toc-tic)
     # print(f'{keys[0]} ed.')
-    # print('Time elapsed:', time.time() - very_start)
+    # print('Time elapsed:', time.time() - fmm_start)
 
     #2
     tic = time.perf_counter()
@@ -92,7 +92,7 @@ def fmm_calc_phi(tree, idx_helpers, lvls, p):
     toc = time.perf_counter()
     times[keys[1]].append(toc-tic)
     # print(f'{keys[1]} ed.')
-    # print('Time elapsed:', time.time() - very_start)
+    # print('Time elapsed:', time.time() - fmm_start)
 
     time_M2L = 0
     time_L2L = 0
@@ -117,7 +117,7 @@ def fmm_calc_phi(tree, idx_helpers, lvls, p):
     # print(f'{keys[2]} ed.')
     times[keys[3]].append(time_L2L)
     # print(f'{keys[3]} ed.')
-    # print('Time elapsed:', time.time() - very_start)
+    # print('Time elapsed:', time.time() - fmm_start)
     
     time_L2P = 0
     time_P2P = 0
@@ -138,7 +138,7 @@ def fmm_calc_phi(tree, idx_helpers, lvls, p):
     # print(f'{keys[4]} ed.')
     times[keys[5]].append(time_P2P)
     # print(f'{keys[5]} ed.')
-    print('Time elapsed:', time.time() - very_start)
+    print('Time elapsed within fmm:', time.time() - fmm_start)
     print('end of fmm calc')
-    # print()
+    print()
     return times
