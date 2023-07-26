@@ -1,5 +1,6 @@
-# FMM - spatial distribution of error
-# This simulation gives a visualisation of the spatial distribution of the errors on the particles
+# FMM plot: spatial distribution of error
+# This simulation gives a visualisation of the spatial distribution of the 
+# errors on the particles.
 print(
 """
 In the event of ImportError:
@@ -22,14 +23,18 @@ import matplotlib.pyplot as plt
 from ..classes import GridComplex
 from ..helperfunctions import construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
 
-p = 5
-n = 5000 # n=5000 takes around 4 mins to run
+# initialise fixed parameters
+p = 15 # n=5000, p=15 takes around 6 mins to run
+p = 10
+n = 5000 
 ptcmax = 10
 lvls = int(np.ceil(np.emath.logn(4, n/ptcmax)))
 
 very_start = time.time()
 print(f"------ p = {p}, n = {n}, lvls = {lvls}, ptcmax = {ptcmax} ------")
 print("Timer elapsed reset.")
+
+# initialise particles
 np.random.seed(4)
 gridcomplex = GridComplex(size=128)
 all_coords = [i for i in range(n)]
@@ -37,6 +42,7 @@ all_q = np.random.random(len(all_coords))*10+50
 all_particles = gridcomplex.create_particles(len(all_coords), all_coords=None, all_q=all_q)
 print('Grid and particles initialised.')
 
+# FMM tree construction
 tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
 if crowded:
     while crowded:
@@ -47,20 +53,31 @@ if crowded:
     print(f'lvls readjusted to {lvls}.')
 print('Tree constructed.')
 
+# FMM calculation
 innertimes = fmm_calc_phi(tree, idx_helpers, lvls, p)
+
+# FMM calculation output stored in "fmm"
 fmm = gridcomplex.get_all_phi()
 
+# direct calculation
 grid_direct_sum_complex(gridcomplex)
 print(f'Directly calculated.')
 print('Time elapsed:', time.time() - very_start)
 
+# direct calculation output stored in "exactcomplex"
 exactcomplex = np.array(gridcomplex.get_all_phi())
+
+# (absolute) fractional error calculation
 fmm_errs = (fmm-exactcomplex).real/exactcomplex.real
 
+# plot spatial distribution of errors
 fig, ax = plt.subplots(figsize=(9,7))
 x, y = (lambda x: (x.real, x.imag))(gridcomplex.get_all_coords())
-
 data = abs(fmm_errs)
 sc = plt.scatter(x, y, c=data, vmin = min(data), vmax=max(data), cmap = 'cividis_r', s=3)
-plt.colorbar(sc, label='FMM fractional error')
+title = f'FMM spatial distribution of error, $N$ = {n}, $p$ =  {p}, $lvls = {lvls}$'
+plt.title(title)
+plt.colorbar(sc, label='(abs.) fractional error')
 plt.show()
+if input("save plot? (y/n) ") == 'y':
+    fig.savefig(title + '.jpg', dpi=300)

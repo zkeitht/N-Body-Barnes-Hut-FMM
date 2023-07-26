@@ -1,4 +1,8 @@
 # FMM: p variation
+"""The below code runs the FMM code for different $p$ (order of expansion).
+$N$ and $ptcmax$ are fixed. The timing and error as a function of $p$ will 
+be examined.
+"""
 print(
 """
 In the event of ImportError:
@@ -22,38 +26,28 @@ import time
 from ..classes import GridComplex
 from ..helperfunctions import construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
 
-N_range = np.logspace(2,3,5).astype('i') # [100, 1000]; takes around 30s to run; 1m45s with direct
-# N_range = np.logspace(2,4,8).astype('i') # [100, 10000]; takes around
-# N_range = np.logspace(2,4.5,10).astype('i') # [100, 31622]; takes *at least* 10m; not sure how long exactly
-p_range = []
+p_range = np.arange(0,35).astype('i')
 ptcmax_range = []
 max_errs = []
 lvlss = []
-
-# skip direct calculation to save time (set run_direct to False)
-run_direct = True
-if run_direct:
-    print('Direct calculation will be executed - this will take a while to run.')
 
 # time keeper for different components (keys)
 innerkeys = ['S2M', 'M2M', 'M2L', 'L2L', 'L2P', 'P2P']
 keys = ['construct_tree', 'fmm_calc', 'direct_sum'] + innerkeys
 times = {key:[] for key in keys}
 
-# loop FMM over different N
-for n in N_range:
+for p in p_range:
     # initialise fixed parameters
-    p = 10
-    p_range.append(p)
+    n = 100 # takes arund 1m30s to run
     ptcmax = 10
     ptcmax_range.append(ptcmax)
     lvls = int(np.ceil(np.emath.logn(4, n/ptcmax))) #+1
-
+    
     print()
     print()
     print()
-    print(f"------ p = {p}, n = {n}, lvls = {lvls}, ptcmax = {ptcmax} ------")
     very_start = time.time()
+    print(f"------ p = {p}, n = {n}, lvls = {lvls}, ptcmax = {ptcmax} ------")
     print("Timer elapsed reset.")
 
     # initialise particles
@@ -97,52 +91,31 @@ for n in N_range:
     fmm = gridcomplex.get_all_phi()
     # print('Time elapsed:', time.time() - very_start)
 
-    # skip direct calculation by default as that takes much more time
-    if run_direct:
-        # direct calculation
-        tic = time.perf_counter()
-        grid_direct_sum_complex(gridcomplex)
-        toc = time.perf_counter()
-        times[keys[2]].append(toc-tic)
-        print('Directly calculated.')
-        print('Time elapsed:', time.time() - very_start)
-        
-        # direct calculation output stored in "exactcomplex"
-        exactcomplex = np.array(gridcomplex.get_all_phi())
+    # direct calculation
+    tic = time.perf_counter()
+    grid_direct_sum_complex(gridcomplex)
+    toc = time.perf_counter()
+    times[keys[2]].append(toc-tic)
+    print('Directly calculated.')
+    print('Time elapsed:', time.time() - very_start)
 
-        # (absolute) relative error calculation
-        fmm_errs = (fmm-exactcomplex).real/exactcomplex.real
-        data = abs(fmm_errs)
-        max_errs.append(max(data))
+    # direct calculation output stored in "exactcomplex"
+    exactcomplex = np.array(gridcomplex.get_all_phi())
+
+    # (absolute) fractional error calculation
+    fmm_errs = (fmm-exactcomplex).real/exactcomplex.real
+    data = abs(fmm_errs)
+    max_errs.append(max(data))
 print()
 
-# FMM plot: lvls vs N
-if input("Generate lvls vs N plot? (y/n) ") == 'y':
+# FMM plot: t vs p
+if input("Generate t vs p plot? (y/n) ") == 'y':
     fig, ax = plt.subplots(figsize = (10,6))
-    xlabel = 'N_range'
-    x = eval(xlabel)
-    y = lvlss
-    title = 'FMM Number of levels vs log $N$'
-    ax.set_title(title)
-    ax.plot(np.log10(x), y)
-    ax.set_xlabel(f'log$_{{{10}}}$ ${xlabel[0]}$')
-    ax.set_ylabel('lvls')
-    ax.yaxis.get_major_locator().set_params(integer=True)
-    plt.show()
-    if input("save plot? (y/n) ") == 'y':
-        fig.savefig(title + '.jpg', dpi=300)
-print()
-
-# FMM plot: t vs N (linear)
-if input("Generate t vs N (linear) plot? (y/n) ") == 'y':
-    fig, ax = plt.subplots(figsize = (10,6))
-    xlabel = 'N_range'
+    xlabel = 'p_range'
     x = eval(xlabel)
 
-    # selecting components (keys) to plot
-    excluded_keys = ('direct_sum')
-    if run_direct:
-        excluded_keys = ()
+    # select all components to plot except contruct_tree and direct_sum
+    excluded_keys = ['construct_tree', 'direct_sum']
     step_keys = [key for key in keys if key not in excluded_keys]
 
     # plot each component
@@ -152,13 +125,15 @@ if input("Generate t vs N (linear) plot? (y/n) ") == 'y':
         X = np.log(x[x!=0])
         Y = np.log(y[x!=0])
         a, b = np.polyfit(X, Y, 1)
-
+        # ax.plot(X, Y, label = f'{keys[i]},  $t \propto N^{{{a:.2f}}}$')
+        # ax.plot(x, np.exp(b)*x**a, label = f'{step_keys[i]},  $t \propto {xlabel[0]}^{{{a:.2f}}}$')
+        
         # default linestyle, label, scaling (x10 as most values are too small)
         linestyle = '-'
         label = step_keys[i] + ' (×10)'
         y = y * 10
         # special cases:
-        if step_keys[i] in ('fmm_calc', 'M2L', 'direct_sum'):
+        if step_keys[i] in ('fmm_calc', 'M2L'):
             label = step_keys[i]
             y = y / 10
             if step_keys[i] == 'fmm_calc':
@@ -167,60 +142,66 @@ if input("Generate t vs N (linear) plot? (y/n) ") == 'y':
                 linestyle = ':'
         if step_keys[i] == 'L2L':
             linestyle = '-.'
-        ax.plot(x, y, label=f'{label},  $t \propto {xlabel[0]}^{{{a:.2f}}}$', linestyle=linestyle)
+        ax.plot(x, y, label = f'{label},  $t \propto {xlabel[0]}^{{{a:.2f}}}$', linestyle=linestyle)
 
-    title = f'FMM $t$ vs ${xlabel[0]}$'
+    title = f'FMM $t$ vs $p$; $N$={n}'
     ax.set_title(title)
-    ax.set_xlabel(f'log ${xlabel[0]}$')
-    ax.set_xlabel('$N$ particles')
+    ax.set_xlabel('log $N$')
+    ax.set_xlabel('$p$ (order of expansion)')
     ax.set_ylabel('log $t$')
     ax.set_ylabel('$t$ / s')
-    plt.legend(loc='upper left')
+    plt.legend()
     plt.show()
     if input("save plot? (y/n) ") == 'y':
-        if run_direct:
-            title += ' (direct included)'
         fig.savefig(title + '.jpg', dpi=300)
 print()
 
-# FMM plot: t vs N (log) (main components only)
-if input("Generate t vs N (log) plot? (y/n) ") == 'y':
-    fig, ax = plt.subplots(figsize = (10,8))
-    xlabel = 'N_range'
-    x = eval(xlabel)
+# FMM plot: error vs p
+if input("Generate error vs p plot? (y/n) ") == 'y':
+    fig, ax = plt.subplots()
+    x = p_range
+    y = np.array(max_errs)
+    Y = np.log10(y[x!=0])
+    ax.plot(x[x>0], Y, label = 'max_error')
 
-    # selecting components (keys) to plot
-    # all keys: [construct_tree, fmm_calc, direct_sum, S2M, M2M, M2L, L2L, L2P, P2P]
-    excluded_keys = ['direct_sum', 'S2M', 'M2M', 'M2L', 'L2L', 'L2P', 'P2P']
-    if run_direct:
-        excluded_keys.remove('direct_sum')
-    step_keys = [key for key in keys if key not in excluded_keys]
-    
-    # plot each component
-    for i in range(len(step_keys)):
-        y = np.array(times[step_keys[i]])
-        X = np.log10(x[x!=0])
-        Y = np.log10(y[x!=0])
-        a, b = np.polyfit(X, Y, 1)
-        linestyle = '-'
-        if step_keys[i] == 'fmm_calc':
-            linestyle = '--'
-        elif step_keys[i] == 'M2L':
-            linestyle = ':'
-        elif step_keys[i] == 'L2L':
-            linestyle = '-.'
-        label = step_keys[i]
-        ax.plot(X, Y, label=f'{label}, experimental', linestyle=linestyle, lw=3)
-        ax.plot(X, a*X+b, label=f'{label}, fit: $t \propto {xlabel[0]}^{{{a:.2f}}}$', linestyle='--')
+    # polynomial fitting - only fit those before machine precision
+    fit_upper = 26
+    a, b = np.polyfit(x[:fit_upper], Y[:fit_upper], 1)
+    ax.plot(x[x>0][:fit_upper], a*x[:fit_upper] + b, label=f'fit: max_error $\propto e^{{{a:.2f}p}}$')
 
-    title = f'FMM log $t$ vs log ${xlabel[0]}$'
+    title = 'FMM log max_error vs $p$'
     ax.set_title(title)
-    ax.set_xlabel(f'log$_{{{10}}}$ ${xlabel[0]}$')
-    ax.set_ylabel('log$_{10}$ $t$')
-    plt.legend(loc='upper left')
+    ax.set_xlabel('$p$')
+    ax.set_ylabel('log$_{10}$ max_error')
+    plt.legend()
     plt.show()
     if input("save plot? (y/n) ") == 'y':
-        if run_direct:
-            title += ' (direct included)'
-            fig.savefig(title + '.jpg', dpi=300)
+        fig.savefig(title + '.jpg', dpi=300)
+print()
+
+# FMM plot: t_M2L vs p
+if input("Generate t_M2L vs p plot? (y/n) ") == 'y':
+    fig, ax = plt.subplots(figsize = (8,6))
+    xlabel = 'p_range'
+    x = eval(xlabel)
+    y = np.array(times['M2L'])
+    ax.plot(x, y, label = 'expm  $t_{M2L}$')
+    X = np.log(x[x!=0])
+    Y = np.log(y[x!=0])
+    a, b = np.polyfit(X, Y, 1)
+    ax.plot(x, np.exp(b)*x**a, label = f'Power-law fit  $t \propto {xlabel[0]}^{{{a:.2f}}}$', linestyle = '--')
+    # exponential fit: meaningless
+    # X = x[x!=0]
+    # Y = np.log(y[x!=0])
+    # a, b = np.polyfit(X, Y, 1)
+    # ax.plot(x, np.exp(b)*np.exp(a*x), label = f'Exponential fit  $t \propto e^{{{{{a:.2f}}}{xlabel[0]}}}$', linestyle = ':')
+
+    title = f'FMM $t_{{M2L}}$ vs $p$; $N$={n}'
+    ax.set_title(title)
+    ax.set_xlabel('$p$ (order of expansion)')
+    ax.set_ylabel('$t_{M2L}$ / s')
+    plt.legend()
+    plt.show()
+    if input("save plot? (y/n) ") == 'y':
+        fig.savefig(title + '.jpg', dpi=300)
 print()

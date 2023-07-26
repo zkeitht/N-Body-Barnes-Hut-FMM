@@ -1,4 +1,8 @@
 # BH: N variation
+"""The below code runs the BH code for different $N$ (number of particles).
+$\theta$ is fixed at $0.5$. The timing and error as a function of $N$ will
+be examined.
+"""
 print(
 """
 In the event of ImportError:
@@ -17,8 +21,8 @@ import time
 from ..classes import Grid
 from ..helperfunctions import bh_create_tree, bh_calc_phi, grid_direct_sum
 
-# N_range = np.logspace(2,3.5,5).astype('i') # [100, 3162]; takes around 2m30s to run
-N_range = np.logspace(2,3,4).astype('i') # [100, 1000]; takes < 1m to run
+N_range = np.logspace(2,3.5,5).astype('i') # [100, 3162]; takes around 2m30s to run
+# N_range = np.logspace(2,3,4).astype('i') # [100, 1000]; takes < 1m to run
 depths = []
 max_errs = []
 
@@ -83,7 +87,7 @@ for n in N_range:
     # direct calculation output stored in "exact"
     exact = np.array(grid.get_all_phi())
     
-    # (absolute) relative error calculation
+    # (absolute) fractional error calculation
     bh_errs = (bh-exact)/exact
     data = abs(bh_errs)
     max_errs.append(max(data))

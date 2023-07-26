@@ -1,4 +1,7 @@
-# FMM steps - uses FMM core calculations, and combines all of the steps in the end
+# FMM steps
+""" Uses FMM core calculations, and combines all of the steps in the final 
+fmm_calc_phi function. fmm_calc_phi also keeps track of the time used by 
+each of the steps."""
 import time
 
 from .complex_functions import direct_sum_complex, direct_source_target_complex
@@ -57,7 +60,7 @@ def fmm_step_P2P(leaf_box, tree, idx_helpers):
 
 def fmm_calc_phi(tree, idx_helpers, lvls, p):
     """Combines all the fmm_steps.
-    The resulting potentials are stored in the phi attribute of the particles
+    The resulting potentials are stored in the phi attribute of the particles.
     1. S2M: Finds source representation.
         (source particles -> leaf child box)
     2. M2M: Transfers source representation. 
@@ -70,6 +73,10 @@ def fmm_calc_phi(tree, idx_helpers, lvls, p):
         (leaf child box -> target particles)
     6. P2P: Evaluates potential directly from nearby sources.
         (neighbouring boxes + leaf child box sources -> leaf child box targets)
+
+    Returns
+    -------
+    a dictionary of times elapsed for each of the steps.
     """
     print()
     print('start of fmm calc...')

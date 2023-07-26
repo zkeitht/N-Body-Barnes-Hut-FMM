@@ -1,4 +1,7 @@
 # BH: theta variation
+"""The below code runs the BH code for different θ (separation parameter).
+N is fixed at 100. The timing and error as a function of θ will be examined.
+"""
 print(
 """
 In the event of ImportError:
@@ -77,7 +80,7 @@ for theta in theta_range:
     # direct calculation output stored in "exact"
     exact = np.array(grid.get_all_phi())
 
-    # (absolute) relative error calculation
+    # (absolute) fractional error calculation
     bh_errs = (bh-exact)/exact
     data = abs(bh_errs)
     max_errs.append(max(data))

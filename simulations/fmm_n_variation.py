@@ -1,4 +1,7 @@
 # FMM: N variation
+"""The below code runs the FMM code for different $N$ (number of particles).
+$p$ and $ptcmax$ are fixed. The timing as a function of $N$ will be examined.
+"""
 print(
 """
 In the event of ImportError:
@@ -23,7 +26,7 @@ from ..classes import GridComplex
 from ..helperfunctions import construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
 
 # N_range = np.logspace(2,3,5).astype('i') # [100, 1000]; takes around 30s to run; 1m45s with direct
-N_range = np.logspace(2,4,8).astype('i') # [100, 10000]; takes around 9m to run; 
+N_range = np.logspace(2,4,8).astype('i') # [100, 10000]; takes around 9m to run; 50m! with direct
 # N_range = np.logspace(2,4.5,10).astype('i') # [100, 31622]; takes *at least* 10m; not sure how long exactly
 p_range = []
 ptcmax_range = []
@@ -31,7 +34,7 @@ max_errs = []
 lvlss = []
 
 # skip direct calculation to save time (set run_direct to False)
-run_direct = True
+run_direct = False
 if run_direct:
     print('Direct calculation will be executed - this will take a while to run.')
 
@@ -109,7 +112,7 @@ for n in N_range:
         # direct calculation output stored in "exactcomplex"
         exactcomplex = np.array(gridcomplex.get_all_phi())
 
-        # (absolute) relative error calculation
+        # (absolute) fractional error calculation
         fmm_errs = (fmm-exactcomplex).real/exactcomplex.real
         data = abs(fmm_errs)
         max_errs.append(max(data))

@@ -65,7 +65,7 @@ class Grid():
         self.ax.scatter(all_x, all_y, color = all_colours)
         return self.fig
 
-    def draw_squares(self, lvls, save=0):
+    def draw_squares(self, lvls, show_ticks=1, save=0):
         """Draws square grid at given level.
         Call grid.draw() first to include particles.
         """
@@ -79,8 +79,9 @@ class Grid():
             lw *= 0.6
         ax.set_xlim(0, size)
         ax.set_ylim(0, size)      
-        # ax.set_xticks([])      
-        # ax.set_yticks([])
+        if not show_ticks:
+            ax.set_xticks([])      
+            ax.set_yticks([])
         if save:
             name = input('') + f' Grid level {lvls}' + '.jpg'
             fig.savefig(name, dpi=500)
@@ -93,6 +94,8 @@ class Grid():
         r is the distance between the particle and the source particles. 
         The potential of each of the particles is stored in the phi attribute of 
         the particles.
+
+        - Note that the potential used here is NOT q*log|r| but q/r
         """
         self.clear_all_phi()
         for i, target in enumerate(self.particles):
