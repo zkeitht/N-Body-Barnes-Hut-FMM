@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 import time
 
 from ..classes import Grid
-from ..helperfunctions import bh_create_tree, bh_calc_phi, grid_direct_sum
+from ..functions import bh_create_tree, bh_calc_phi, grid_direct_sum
 
 theta_range = np.arange(0, 19, 0.5)
 depths = []

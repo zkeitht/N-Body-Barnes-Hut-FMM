@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import time
 
 from ..classes import Grid
-from ..helperfunctions import bh_create_tree, bh_calc_phi, grid_direct_sum
+from ..functions import bh_create_tree, bh_calc_phi, grid_direct_sum
 
 N_range = np.logspace(2,3.5,5).astype('i') # [100, 3162]; takes around 2m30s to run
 # N_range = np.logspace(2,3,4).astype('i') # [100, 1000]; takes < 1m to run

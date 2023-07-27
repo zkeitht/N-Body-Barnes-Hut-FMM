@@ -11,7 +11,7 @@ In the event of ImportError:
    which relative imports like ..classes won't work)
 --------------------
 In the event of ModuleNotFoundError:
-1. CHANGE "classes" to "..classes" in helperfunctions/fmm_functions.py
+1. CHANGE "classes" to "..classes" in functions/fmm_functions.py
 2. Perform step 1 of above "In the event of ImportError".
 3. After running, CHANGE  "..classes" back to "classes" for the module to work in Jupyter notebook.
 
@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import time
 
 from ..classes import GridComplex
-from ..helperfunctions import construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
+from ..functions import construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
 
 # N_range = np.logspace(2,3,5).astype('i') # [100, 1000]; takes around 30s to run; 1m45s with direct
 N_range = np.logspace(2,4,8).astype('i') # [100, 10000]; takes around 9m to run; 50m! with direct
