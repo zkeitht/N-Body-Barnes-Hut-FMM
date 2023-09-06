@@ -30,22 +30,22 @@ from ..functions import construct_tree_fmm
 N_range = np.logspace(2, 5.5, 8).astype('i') 
 # N_range = np.logspace(2, 6, 16).astype('i') # quite nice "linear" plot
 
-ptcmax_range = []
+m_range = []
 lvlss = []
 
 # loop FMM over different N
 for n in N_range:
     # initialise fixed parameters
     p = 10
-    ptcmax = 10
-    ptcmax_range.append(ptcmax)
-    lvls = int(np.ceil(np.emath.logn(4, n/ptcmax))) #+1
+    m = 10
+    m_range.append(m)
+    lvls = int(np.ceil(np.emath.logn(4, n/m))) #+1
 
     print()
     print()
     print()
     very_start = time.time()
-    print(f"------ p = {p}, n = {n}, lvls = {lvls}, ptcmax = {ptcmax} ------")
+    print(f"------ p = {p}, n = {n}, lvls = {lvls}, m = {m} ------")
 
     # initialise particles
     np.random.seed(4)
@@ -58,13 +58,13 @@ for n in N_range:
 
     # FMM tree construction
     tic = time.perf_counter()
-    tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
+    tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
     toc = time.perf_counter()
     # if crowded:
         # while crowded:
         #     lvls+=1
         #     tic = time.perf_counter()
-        #     tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
+        #     tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
         #     toc = time.perf_counter()
         # print(f'lvls readjusted to {lvls}.')
     lvlss.append(lvls)
@@ -79,7 +79,7 @@ if input("Generate lvls vs N plot? (y/n) ") == 'y':
     xlabel = 'N_range'
     x = eval(xlabel)
     y = lvlss
-    title = f'FMM Number of levels vs log $N$; $ptcmax$ = {ptcmax}'
+    title = f'FMM Number of levels vs log $N$; $m$ = {m}'
     ax.set_title(title)
     ax.plot(np.log10(x), y)
     ax.set_xlabel(f'log$_{{{10}}}$ ${xlabel[0]}$')

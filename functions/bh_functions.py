@@ -9,7 +9,7 @@ def bh_tree_insert_particle(particle, box, counter=0):
     box.add_com(particle)
     # box.print_step(particle, box, add_com=1)
 
-    if len(box.particles) < box.ptcmax: # if there is vacancy
+    if len(box.particles) < box.m: # if there is vacancy
         box.particles.append(particle)
         # box.print_step(particle, box, add_ptc=1)
     elif box.children: # children exists (and box full)

@@ -27,11 +27,11 @@ from ..functions import construct_tree_fmm, fmm_calc_phi, grid_direct_sum_comple
 p = 15 # n=5000, p=15 takes around 6 mins to run
 p = 10
 n = 5000 
-ptcmax = 10
-lvls = int(np.ceil(np.emath.logn(4, n/ptcmax)))
+m = 10
+lvls = int(np.ceil(np.emath.logn(4, n/m)))
 
 very_start = time.time()
-print(f"------ p = {p}, n = {n}, lvls = {lvls}, ptcmax = {ptcmax} ------")
+print(f"------ p = {p}, n = {n}, lvls = {lvls}, m = {m} ------")
 print("Timer elapsed reset.")
 
 # initialise particles
@@ -43,12 +43,12 @@ all_particles = gridcomplex.create_particles(len(all_coords), all_coords=None, a
 print('Grid and particles initialised.')
 
 # FMM tree construction
-tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
+tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
 if crowded:
     while crowded:
         lvls+=1
         tic = time.perf_counter()
-        tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
+        tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
         toc = time.perf_counter()
     print(f'lvls readjusted to {lvls}.')
 print('Tree constructed.')

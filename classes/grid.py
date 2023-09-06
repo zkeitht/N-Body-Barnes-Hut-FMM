@@ -17,7 +17,7 @@ class Grid():
         self.fig, self.ax = plt.subplots(figsize=(6,6))
         self.particles = []
         self.points = []
-        self.rootbox = Box(coords=(size/2, size/2), size=size, ptcmax=1, grid=self)
+        self.rootbox = Box(coords=(size/2, size/2), size=size, m=1, grid=self)
         plt.close()
 
     def add_point(self, point):

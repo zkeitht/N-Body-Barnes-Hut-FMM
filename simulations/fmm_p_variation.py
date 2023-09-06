@@ -1,6 +1,6 @@
 # FMM: p variation
 """The below code runs the FMM code for different $p$ (order of expansion).
-$N$ and $ptcmax$ are fixed. The timing and error as a function of $p$ will 
+$N$ and $m$ are fixed. The timing and error as a function of $p$ will 
 be examined.
 """
 print(
@@ -27,7 +27,7 @@ from ..classes import GridComplex
 from ..functions import construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
 
 p_range = np.arange(0,35).astype('i')
-ptcmax_range = []
+m_range = []
 max_errs = []
 lvlss = []
 
@@ -39,15 +39,15 @@ times = {key:[] for key in keys}
 for p in p_range:
     # initialise fixed parameters
     n = 100 # takes arund 1m30s to run
-    ptcmax = 10
-    ptcmax_range.append(ptcmax)
-    lvls = int(np.ceil(np.emath.logn(4, n/ptcmax))) #+1
+    m = 10
+    m_range.append(m)
+    lvls = int(np.ceil(np.emath.logn(4, n/m))) #+1
     
     print()
     print()
     print()
     very_start = time.time()
-    print(f"------ p = {p}, n = {n}, lvls = {lvls}, ptcmax = {ptcmax} ------")
+    print(f"------ p = {p}, n = {n}, lvls = {lvls}, m = {m} ------")
     print("Timer elapsed reset.")
 
     # initialise particles
@@ -61,13 +61,13 @@ for p in p_range:
 
     # FMM tree construction
     tic = time.perf_counter()
-    tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
+    tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
     toc = time.perf_counter()
     if crowded:
         while crowded:
             lvls+=1
             tic = time.perf_counter()
-            tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
+            tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
             toc = time.perf_counter()
         print(f'lvls readjusted to {lvls}.')
     lvlss.append(lvls)

@@ -7,12 +7,12 @@ class Box():
     ---------
     coords: center coordinates of the box.
     com: ΣmR/Σm (summed over all particles) m can be charge or mass
-    ptcmax: maximum number of particles allowed in the box.
+    m: maximum number of particles allowed in the box.
     """
-    def __init__(self, coords, size=16, ptcmax=1, parent=None, grid=None):
+    def __init__(self, coords, size=16, m=1, parent=None, grid=None):
         self.coords = np.array(coords)
         self.size = size
-        self.ptcmax = ptcmax
+        self.m = m
         self.parent = parent
         if self.parent is not None:
             self.parent.children.append(self)
@@ -36,7 +36,7 @@ class Box():
         q_i = np.arange(4)
         q_xs = (q_i%2 * size) - size/2 + x 
         q_ys = (q_i//2 * size) - size/2 + y
-        q_children = [Box((qx, qy), size, ptcmax=self.ptcmax, parent=self) for qx, qy in zip(q_xs, q_ys)]
+        q_children = [Box((qx, qy), size, m=self.m, parent=self) for qx, qy in zip(q_xs, q_ys)]
         return q_children
     
     def get_child_quadrant(self, particle):
@@ -76,10 +76,10 @@ class BoxComplex():
     ---------
     coords: center coordinates of the box.
     """
-    def __init__(self, coords, size=16, ptcmax=10, parent=None, grid=None, p=6):
+    def __init__(self, coords, size=16, m=10, parent=None, grid=None, p=6):
         self.coords = coords
         self.size = size
-        self.ptcmax = ptcmax
+        self.m = m
         self.parent = parent
         if self.parent is not None:
             self.parent.children.append(self)
@@ -104,7 +104,7 @@ class BoxComplex():
         q_i = np.arange(4)
         q_xs = (q_i%2 * size) - size/2 + x 
         q_ys = (q_i//2 * size) - size/2 + y
-        q_children = [BoxComplex(qx +1j*qy, size, ptcmax=self.ptcmax, parent=self, p=self.p) for qx, qy in zip(q_xs, q_ys)]
+        q_children = [BoxComplex(qx +1j*qy, size, m=self.m, parent=self, p=self.p) for qx, qy in zip(q_xs, q_ys)]
         return q_children
     
     def coords_to_real(self):

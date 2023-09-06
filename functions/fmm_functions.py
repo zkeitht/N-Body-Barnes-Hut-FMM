@@ -32,8 +32,8 @@ def bin_coords_to_ij(items, lvl):
     bin_js = np.digitize(all_coords_y, np.arange(0, grid.size, grid.size/(2**lvl)))-1
     return bin_is, bin_js
 
-def construct_tree_fmm(lvls, grid, ptcmax, p):
-    tree = [[BoxComplex(grid.size/2+1j*grid.size/2, size=grid.size, ptcmax=ptcmax, grid=grid,p=p)]]
+def construct_tree_fmm(lvls, grid, m, p):
+    tree = [[BoxComplex(grid.size/2+1j*grid.size/2, size=grid.size, m=m, grid=grid,p=p)]]
     crowded = False
     crowd = {key:[] for key in ('coords', 'nptcs')}
     # empty tree
@@ -49,12 +49,12 @@ def construct_tree_fmm(lvls, grid, ptcmax, p):
     for ptc, bin_i, bin_j in zip(grid.particles, bin_is, bin_js):
         tree[lvls][idx_helpers[lvls][bin_i][bin_j]].particles.append(ptc)
     for leaf_box in tree[lvls]:
-        if len(leaf_box.particles) >= ptcmax:
+        if len(leaf_box.particles) >= m:
             crowd['coords'].append(leaf_box.coords)
             crowd['nptcs'].append(len(leaf_box.particles))
     if crowd['nptcs']:
         # print(f"Leaf box(es) centered at {crowd['coords']} too crowded, it has {crowd['nptcs']} particles. Try increasing 'lvls'.")
-        print(f'crowded: some boxes have more than {ptcmax} particles')
+        print(f'crowded: some boxes have more than {m} particles')
         crowded = True
 
     return tree, idx_helpers, crowded
