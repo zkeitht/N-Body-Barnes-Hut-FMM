@@ -26,7 +26,10 @@ import time
 from ..classes import GridComplex
 from ..functions import construct_tree_fmm
 
-N_range = np.logspace(2,5,10).astype('i') # [100, 100000]; takes within 1m
+# N_range = np.logspace(2,5,10).astype('i') # [100, 100000]; takes within 1m
+N_range = np.logspace(2, 5.5, 8).astype('i') 
+# N_range = np.logspace(2, 6, 16).astype('i') # quite nice "linear" plot
+
 ptcmax_range = []
 lvlss = []
 
@@ -57,13 +60,13 @@ for n in N_range:
     tic = time.perf_counter()
     tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
     toc = time.perf_counter()
-    if crowded:
-        while crowded:
-            lvls+=1
-            tic = time.perf_counter()
-            tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
-            toc = time.perf_counter()
-        print(f'lvls readjusted to {lvls}.')
+    # if crowded:
+        # while crowded:
+        #     lvls+=1
+        #     tic = time.perf_counter()
+        #     tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
+        #     toc = time.perf_counter()
+        # print(f'lvls readjusted to {lvls}.')
     lvlss.append(lvls)
     print(f'Tree constructed.')
     print('Time elapsed:', time.time() - very_start)

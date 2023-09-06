@@ -25,9 +25,15 @@ import time
 from ..classes import GridComplex
 from ..functions import construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
 
+# timing estimations uses p = 10
 # N_range = np.logspace(2,3,5).astype('i') # [100, 1000]; takes around 30s to run; 1m45s with direct
-N_range = np.logspace(2,4,8).astype('i') # [100, 10000]; takes around 9m to run; 50m! with direct
-# N_range = np.logspace(2,4.5,10).astype('i') # [100, 31622]; takes *at least* 10m; not sure how long exactly
+# N_range = np.logspace(2,4,8).astype('i') # [100, 10000]; takes around 9m to run; 50m! with direct
+N_range = np.logspace(2,4.5,10).astype('i') # [100, 31622]; took around 6m to run!
+# N_range = np.logspace(2, 5.5, 8).astype('i') # estimated runtime: 1 hour (without direct) # ran overnight? interrupted
+# N_range = np.logspace(2, 5.3, 4).astype('i') # [100, 199526] took around 50 m to run (without direct)
+# N_range = np.logspace(2, 6, 12).astype('i') # too ambitious for p = 10
+
+
 p_range = []
 ptcmax_range = []
 max_errs = []
@@ -46,7 +52,7 @@ times = {key:[] for key in keys}
 # loop FMM over different N
 for n in N_range:
     # initialise fixed parameters
-    p = 10
+    p = 5
     p_range.append(p)
     ptcmax = 10
     ptcmax_range.append(ptcmax)
@@ -72,13 +78,13 @@ for n in N_range:
     tic = time.perf_counter()
     tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
     toc = time.perf_counter()
-    if crowded:
-        while crowded:
-            lvls+=1
-            tic = time.perf_counter()
-            tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
-            toc = time.perf_counter()
-        print(f'lvls readjusted to {lvls}.')
+    # if crowded:
+        # while crowded:
+        #     lvls+=1
+        #     tic = time.perf_counter()
+        #     tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, ptcmax, p)
+        #     toc = time.perf_counter()
+        # print(f'lvls readjusted to {lvls}.')
     lvlss.append(lvls)
     times[keys[0]].append(toc-tic)
     print(f'{keys[0]} ed.')
@@ -160,7 +166,7 @@ if input("Generate t vs N (linear) plot? (y/n) ") == 'y':
         label = step_keys[i] + ' (×10)'
         y = y * 10
         # special cases:
-        if step_keys[i] in ('fmm_calc', 'M2L', 'direct_sum'):
+        if step_keys[i] in ('fmm_calc', 'M2L', 'direct_sum', 'P2P'):
             label = step_keys[i]
             y = y / 10
             if step_keys[i] == 'fmm_calc':

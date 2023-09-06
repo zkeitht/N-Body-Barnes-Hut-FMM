@@ -103,6 +103,10 @@ def fmm_calc_phi(tree, idx_helpers, lvls, p):
 
     time_M2L = 0
     time_L2L = 0
+    
+    times["M2L_il"] = []
+    time_M2L_il = 0
+
     for lvl in range(2, lvls+1):
         for box in tree[lvl]:
             #3
@@ -110,6 +114,18 @@ def fmm_calc_phi(tree, idx_helpers, lvls, p):
             fmm_step_M2L(box, tree, idx_helpers)
             toc = time.perf_counter()
             time_M2L += toc-tic
+
+            # tic = time.perf_counter()   
+            # irlist = interaction_list(box, tree, idx_helpers)
+            # toc = time.perf_counter()
+            # time_M2L_il += toc-tic
+            
+            # tic = time.perf_counter()   
+            # for far_source_box in irlist:
+            #     box.M2L_coeffs = box.M2L_coeffs + M2L_coeff(far_source_box.S2M_coeffs, far_source_box, box)
+            # toc = time.perf_counter()
+            # time_M2L += toc-tic
+
 
             if lvl >= lvls:
                 continue
@@ -119,7 +135,7 @@ def fmm_calc_phi(tree, idx_helpers, lvls, p):
             fmm_step_L2L(box)
             toc = time.perf_counter()
             time_L2L += toc-tic
-    
+    # times["M2L_il"].append(time_M2L_il)
     times[keys[2]].append(time_M2L)
     # print(f'{keys[2]} ed.')
     times[keys[3]].append(time_L2L)

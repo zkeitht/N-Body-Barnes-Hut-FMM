@@ -21,6 +21,10 @@ def four_fractal(lvl):
     return None
 
 def bin_coords_to_ij(items, lvl):
+    """Bins given coordinates (of boxes/particles) to box index ij
+    items: particles or boxes, contains .coords attribute
+    runs at O(lvl)
+    """
     grid = items[0].grid
     all_coords = [(item.coords.real, item.coords.imag) for item in items]
     all_coords_x, all_coords_y = [coord for coord in zip(*all_coords)]
@@ -49,7 +53,8 @@ def construct_tree_fmm(lvls, grid, ptcmax, p):
             crowd['coords'].append(leaf_box.coords)
             crowd['nptcs'].append(len(leaf_box.particles))
     if crowd['nptcs']:
-        print(f"Leaf box(es) centered at {crowd['coords']} too crowded, it has {crowd['nptcs']} particles. Try increasing 'lvls'.")
+        # print(f"Leaf box(es) centered at {crowd['coords']} too crowded, it has {crowd['nptcs']} particles. Try increasing 'lvls'.")
+        print(f'crowded: some boxes have more than {ptcmax} particles')
         crowded = True
 
     return tree, idx_helpers, crowded
@@ -75,7 +80,9 @@ def direct_neighbours(box, tree, idx_helpers, inclself=True):
         return dir_neighs
 
 def interaction_list(box, tree, idx_helpers):
-    """Returns the interaction list of a given box."""
+    """Returns the interaction list of a given box.
+    O(lvl)
+    """
     lvl = int(np.log2(box.grid.size/box.size))
     same_lvl_boxes = tree[lvl]
     idx_helper = idx_helpers[lvl]
