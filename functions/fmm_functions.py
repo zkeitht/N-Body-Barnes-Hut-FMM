@@ -32,6 +32,30 @@ def bin_coords_to_ij(items, lvl):
     bin_js = np.digitize(all_coords_y, np.arange(0, grid.size, grid.size/(2**lvl)))-1
     return bin_is, bin_js
 
+def lvls_fmm(n, m, lvlextra=0):
+    """Estimates the number of levels in the fmm tree required given to fix 
+    the number of particles at leaf level to a maximum of m.
+    
+    Arguments
+    ---------
+    n: total number of particles on the grid
+    m: maximum number of particles at the leaf boxes (typically O(1))
+    lvlextra: customizable, adds extra levels
+    
+    Returns
+    -------
+    int
+        estimated number of levels required in the fmm tree
+    
+    More levels are required than this estimation especially if the 
+    particles are not uniformly distributed (some boxes may have > m particles).
+    Adjust lvlextra (typically from 0 to 2) to balance the time taken for the 
+    M2L and P2P steps:
+        a low lvlextra decreases the runtime of M2L, but increases that of P2P
+    """
+    return int(np.ceil(np.emath.logn(4, n/m))) + lvlextra
+
+
 def construct_tree_fmm(lvls, grid, m, p):
     tree = [[BoxComplex(grid.size/2+1j*grid.size/2, size=grid.size, m=m, grid=grid,p=p)]]
     crowded = False
@@ -53,8 +77,11 @@ def construct_tree_fmm(lvls, grid, m, p):
             crowd['coords'].append(leaf_box.coords)
             crowd['nptcs'].append(len(leaf_box.particles))
     if crowd['nptcs']:
+        max_nptcs = max(crowd['nptcs'])
         # print(f"Leaf box(es) centered at {crowd['coords']} too crowded, it has {crowd['nptcs']} particles. Try increasing 'lvls'.")
-        print(f'crowded: some boxes have more than {m} particles')
+        print(f"Crowded: {len(crowd['coords'])} boxes have more than {m} " \
+              f"particles. Extreme case: {max_nptcs} particles. Increase " \
+              "lvlextra if P2P is taking more time to run compared to M2L.")
         crowded = True
 
     return tree, idx_helpers, crowded

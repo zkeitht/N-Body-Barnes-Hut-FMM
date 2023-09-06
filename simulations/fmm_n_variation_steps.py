@@ -24,11 +24,11 @@ import matplotlib.pyplot as plt
 import time
 
 from ..classes import GridComplex
-from ..functions import construct_tree_fmm
+from ..functions import lvls_fmm, construct_tree_fmm
 
 # N_range = np.logspace(2,5,10).astype('i') # [100, 100000]; takes within 1m
-N_range = np.logspace(2, 5.5, 8).astype('i') 
-# N_range = np.logspace(2, 6, 16).astype('i') # quite nice "linear" plot
+# N_range = np.logspace(2, 5.5, 8).astype('i') 
+N_range = np.logspace(2, 6, 16).astype('i') # quite nice "linear" plot
 
 m_range = []
 lvlss = []
@@ -39,7 +39,8 @@ for n in N_range:
     p = 10
     m = 10
     m_range.append(m)
-    lvls = int(np.ceil(np.emath.logn(4, n/m))) #+1
+    lvlextra = 0
+    lvls = lvls_fmm(n, m, lvlextra)
 
     print()
     print()

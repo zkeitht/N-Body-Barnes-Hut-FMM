@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import time
 
 from ..classes import GridComplex
-from ..functions import construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
+from ..functions import lvls_fmm, construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
 
 # timing estimations uses p = 10
 # N_range = np.logspace(2,3,5).astype('i') # [100, 1000]; takes around 30s to run; 1m45s with direct
@@ -56,7 +56,8 @@ for n in N_range:
     p_range.append(p)
     m = 10
     m_range.append(m)
-    lvls = int(np.ceil(np.emath.logn(4, n/m))) #+1
+    lvlextra = 0
+    lvls = lvls_fmm(n, m, lvlextra)
 
     print()
     print()
