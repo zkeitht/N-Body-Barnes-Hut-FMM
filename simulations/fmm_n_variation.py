@@ -28,11 +28,17 @@ from ..functions import lvls_fmm, construct_tree_fmm, fmm_calc_phi, grid_direct_
 # timing estimations uses p = 10
 # N_range = np.logspace(2,3,5).astype('i') # [100, 1000]; takes around 30s to run; 1m45s with direct
 # N_range = np.logspace(2,4,8).astype('i') # [100, 10000]; takes around 9m to run; 50m! with direct
-N_range = np.logspace(2,4.5,10).astype('i') # [100, 31622]; took around 6m to run!
+# N_range = np.logspace(2,4.5,10).astype('i') # [100, 31622]; took around 6m to run!
 # N_range = np.logspace(2, 5.5, 8).astype('i') # estimated runtime: 1 hour (without direct) # ran overnight? interrupted
 # N_range = np.logspace(2, 5.3, 4).astype('i') # [100, 199526] took around 50 m to run (without direct)
 # N_range = np.logspace(2, 6, 12).astype('i') # too ambitious for p = 10
 
+# post lvls_fmm:
+N_range = np.logspace(2, 4.5, 10).astype('i') # [100, 31622]; took around 2m to run!
+# N_range = np.logspace(2, 5, 10).astype('i') # [100, 100000]; 11m
+
+# N_range = np.logspace(2, 3.5, 6).astype('i') # 1m with direct
+# N_range = np.logspace(2, 4, 6).astype('i') # 8m with direct
 
 p_range = []
 m_range = []
@@ -79,13 +85,6 @@ for n in N_range:
     tic = time.perf_counter()
     tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
     toc = time.perf_counter()
-    # if crowded:
-        # while crowded:
-        #     lvls+=1
-        #     tic = time.perf_counter()
-        #     tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
-        #     toc = time.perf_counter()
-        # print(f'lvls readjusted to {lvls}.')
     lvlss.append(lvls)
     times[keys[0]].append(toc-tic)
     print(f'{keys[0]} ed.')
@@ -150,6 +149,7 @@ if input("Generate t vs N (linear) plot? (y/n) ") == 'y':
 
     # selecting components (keys) to plot
     excluded_keys = ('direct_sum')
+    # excluded_keys = ('direct_sum', 'fmm_calc', 'M2L')
     if run_direct:
         excluded_keys = ()
     step_keys = [key for key in keys if key not in excluded_keys]
@@ -158,27 +158,27 @@ if input("Generate t vs N (linear) plot? (y/n) ") == 'y':
     for i in range(len(step_keys)):
         y = np.array(times[step_keys[i]])
         # fit to obtain power law exponent
-        X = np.log(x[x!=0])
-        Y = np.log(y[x!=0])
+        X = np.log(x[y!=0])
+        Y = np.log(y[y!=0])
         a, b = np.polyfit(X, Y, 1)
 
-        # default linestyle, label, scaling (x10 as most values are too small)
+        # default linestyle, label, scaling (x10 for construct_tree)
         linestyle = '-'
-        label = step_keys[i] + ' (×10)'
-        y = y * 10
+        label = step_keys[i]
+        
         # special cases:
-        if step_keys[i] in ('fmm_calc', 'M2L', 'direct_sum', 'P2P'):
-            label = step_keys[i]
-            y = y / 10
-            if step_keys[i] == 'fmm_calc':
-                linestyle = '--'
-            elif step_keys[i] == 'M2L':
-                linestyle = ':'
-        if step_keys[i] == 'L2L':
+        if step_keys[i] == 'fmm_calc':
+            linestyle = '--'
+        elif step_keys[i] == 'M2L':
+            linestyle = ':'
+        elif step_keys[i] == 'P2P':
             linestyle = '-.'
+        elif step_keys[i] == 'construct_tree':
+            y *= 10
+            label = step_keys[i] + ' (×10)'
         ax.plot(x, y, label=f'{label},  $t \propto {xlabel[0]}^{{{a:.2f}}}$', linestyle=linestyle)
 
-    title = f'FMM $t$ vs ${xlabel[0]}$'
+    title = f'FMM $t$ vs ${xlabel[0]}$;   $p$={p}, $m$={m}'
     ax.set_title(title)
     ax.set_xlabel(f'log ${xlabel[0]}$')
     ax.set_xlabel('$N$ particles')
@@ -201,6 +201,7 @@ if input("Generate t vs N (log) plot? (y/n) ") == 'y':
     # selecting components (keys) to plot
     # all keys: [construct_tree, fmm_calc, direct_sum, S2M, M2M, M2L, L2L, L2P, P2P]
     excluded_keys = ['direct_sum', 'S2M', 'M2M', 'M2L', 'L2L', 'L2P', 'P2P']
+    # excluded_keys = ['direct_sum'] # to compare components 
     if run_direct:
         excluded_keys.remove('direct_sum')
     step_keys = [key for key in keys if key not in excluded_keys]
@@ -208,21 +209,20 @@ if input("Generate t vs N (log) plot? (y/n) ") == 'y':
     # plot each component
     for i in range(len(step_keys)):
         y = np.array(times[step_keys[i]])
-        X = np.log10(x[x!=0])
-        Y = np.log10(y[x!=0])
+        X = np.log10(x[y!=0])
+        Y = np.log10(y[y!=0])
         a, b = np.polyfit(X, Y, 1)
         linestyle = '-'
+        label = step_keys[i]
         if step_keys[i] == 'fmm_calc':
             linestyle = '--'
         elif step_keys[i] == 'M2L':
             linestyle = ':'
-        elif step_keys[i] == 'L2L':
-            linestyle = '-.'
-        label = step_keys[i]
         ax.plot(X, Y, label=f'{label}, experimental', linestyle=linestyle, lw=3)
-        ax.plot(X, a*X+b, label=f'{label}, fit: $t \propto {xlabel[0]}^{{{a:.2f}}}$', linestyle='--')
+        if step_keys[i] in ['fmm_calc', 'direct_sum', 'construct_tree']:
+            ax.plot(X, a*X+b, label=f'{label}, fit: $t \propto {xlabel[0]}^{{{a:.2f}}}$', linestyle='--')
 
-    title = f'FMM log $t$ vs log ${xlabel[0]}$'
+    title = f'FMM log $t$ vs log ${xlabel[0]}$;   $p$={p}, $m$={m}'
     ax.set_title(title)
     ax.set_xlabel(f'log$_{{{10}}}$ ${xlabel[0]}$')
     ax.set_ylabel('log$_{10}$ $t$')

@@ -21,14 +21,15 @@ import time
 import matplotlib.pyplot as plt
 
 from ..classes import GridComplex
-from ..functions import construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
+from ..functions import lvls_fmm, construct_tree_fmm, fmm_calc_phi, grid_direct_sum_complex
 
 # initialise fixed parameters
 p = 15 # n=5000, p=15 takes around 6 mins to run
 p = 10
 n = 5000 
 m = 10
-lvls = int(np.ceil(np.emath.logn(4, n/m)))
+lvlextra = 0
+lvls = lvls_fmm(n, m, lvlextra)
 
 very_start = time.time()
 print(f"------ p = {p}, n = {n}, lvls = {lvls}, m = {m} ------")
@@ -44,13 +45,13 @@ print('Grid and particles initialised.')
 
 # FMM tree construction
 tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
-if crowded:
-    while crowded:
-        lvls+=1
-        tic = time.perf_counter()
-        tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
-        toc = time.perf_counter()
-    print(f'lvls readjusted to {lvls}.')
+# if crowded:
+#     while crowded:
+#         lvls+=1
+#         tic = time.perf_counter()
+#         tree, idx_helpers, crowded = construct_tree_fmm(lvls, gridcomplex, m, p)
+#         toc = time.perf_counter()
+#     print(f'lvls readjusted to {lvls}.')
 print('Tree constructed.')
 
 # FMM calculation
@@ -75,7 +76,7 @@ fig, ax = plt.subplots(figsize=(9,7))
 x, y = (lambda x: (x.real, x.imag))(gridcomplex.get_all_coords())
 data = abs(fmm_errs)
 sc = plt.scatter(x, y, c=data, vmin = min(data), vmax=max(data), cmap = 'cividis_r', s=3)
-title = f'FMM spatial distribution of error, $N$ = {n}, $p$ =  {p}, $lvls = {lvls}$'
+title = f'FMM spatial distribution of error;   $N$={n}, $p$={p}, $m={m}$'
 plt.title(title)
 plt.colorbar(sc, label='(abs.) fractional error')
 plt.show()

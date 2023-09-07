@@ -79,9 +79,10 @@ def construct_tree_fmm(lvls, grid, m, p):
     if crowd['nptcs']:
         max_nptcs = max(crowd['nptcs'])
         # print(f"Leaf box(es) centered at {crowd['coords']} too crowded, it has {crowd['nptcs']} particles. Try increasing 'lvls'.")
-        print(f"Crowded: {len(crowd['coords'])} boxes have more than {m} " \
-              f"particles. Extreme case: {max_nptcs} particles. Increase " \
-              "lvlextra if P2P is taking more time to run compared to M2L.")
+        print(f"Crowded: {len(crowd['coords'])/(4**lvls)*100:.1f}% of the leaf"\
+              f" boxes have more than {m} particles. Extreme case: {max_nptcs}"\
+              f" particles. Increase lvlextra if P2P is taking more time to "\
+              "run compared to M2L.")
         crowded = True
 
     return tree, idx_helpers, crowded
