@@ -1,7 +1,0 @@
-grid = Grid(size=8)
-np.random.seed(4)
-N = 10
-particles = grid.create_particles(N, all_coords=None, all_q=[i+20 for i in range(1,N+1)])
-root_box = Box(coords=(4,4), size=8, pmax=2, grid='falsegrid')
-grid.draw()
-create_tree(root_box,particles,True)
